@@ -51,6 +51,7 @@ export function MeetingForm({ onSubmit }: { onSubmit: (meeting: Meeting) => void
       duration,
       waitingTime: parseInt(waitingTime) || 0,
       notes,
+      hasArrived: false,
     };
 
     onSubmit(meeting);

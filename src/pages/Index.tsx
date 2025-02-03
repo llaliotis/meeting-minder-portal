@@ -10,6 +10,14 @@ const Index = () => {
     setMeetings((prev) => [meeting, ...prev]);
   };
 
+  const handleUpdateMeeting = (updatedMeeting: Meeting) => {
+    setMeetings((prev) =>
+      prev.map((meeting) =>
+        meeting.id === updatedMeeting.id ? updatedMeeting : meeting
+      )
+    );
+  };
+
   return (
     <div className="container mx-auto py-8 px-4">
       <h1 className="text-3xl font-bold mb-8">Meeting Tracker</h1>
@@ -22,7 +30,7 @@ const Index = () => {
         
         <div>
           <h2 className="text-xl font-semibold mb-4">Today's Meetings</h2>
-          <MeetingsList meetings={meetings} />
+          <MeetingsList meetings={meetings} onUpdateMeeting={handleUpdateMeeting} />
         </div>
       </div>
     </div>
