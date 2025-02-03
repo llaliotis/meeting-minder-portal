@@ -4,15 +4,27 @@ import { format } from "date-fns";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { Pencil } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface MeetingsListProps {
   meetings: Meeting[];
   onUpdateMeeting: (updatedMeeting: Meeting) => void;
   onEditMeeting: (meeting: Meeting) => void;
+  onDeleteMeeting: (meetingId: string) => void;
 }
 
-export function MeetingsList({ meetings, onUpdateMeeting, onEditMeeting }: MeetingsListProps) {
+export function MeetingsList({ meetings, onUpdateMeeting, onEditMeeting, onDeleteMeeting }: MeetingsListProps) {
   const { toast } = useToast();
 
   const handleArrivalToggle = (meeting: Meeting) => {
@@ -54,6 +66,14 @@ export function MeetingsList({ meetings, onUpdateMeeting, onEditMeeting }: Meeti
     });
   };
 
+  const handleDelete = (meetingId: string, customerName: string) => {
+    onDeleteMeeting(meetingId);
+    toast({
+      title: "Meeting Deleted",
+      description: `Meeting with ${customerName} has been deleted`,
+    });
+  };
+
   return (
     <div className="space-y-4">
       {meetings.map((meeting) => (
@@ -70,6 +90,34 @@ export function MeetingsList({ meetings, onUpdateMeeting, onEditMeeting }: Meeti
                 >
                   <Pencil className="h-4 w-4" />
                 </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Delete Meeting</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Are you sure you want to delete the meeting with {meeting.customerName}? This action cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => handleDelete(meeting.id, meeting.customerName)}
+                        className="bg-destructive hover:bg-destructive/90"
+                      >
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
               <div className="flex items-center gap-4 mb-2">
                 <div className="flex items-center gap-2">

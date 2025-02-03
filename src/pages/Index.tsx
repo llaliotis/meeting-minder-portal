@@ -33,6 +33,10 @@ const Index = () => {
     setShowForm(true);
   };
 
+  const handleDeleteMeeting = (meetingId: string) => {
+    setMeetings((prev) => prev.filter((meeting) => meeting.id !== meetingId));
+  };
+
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="flex justify-between items-center mb-8">
@@ -74,6 +78,7 @@ const Index = () => {
             meetings={meetings} 
             onUpdateMeeting={handleUpdateMeeting}
             onEditMeeting={handleEditMeeting}
+            onDeleteMeeting={handleDeleteMeeting}
           />
         </div>
       )}
