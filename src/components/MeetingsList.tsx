@@ -27,30 +27,50 @@ interface MeetingsListProps {
 export function MeetingsList({ meetings, onUpdateMeeting, onEditMeeting, onDeleteMeeting }: MeetingsListProps) {
   const { toast } = useToast();
 
-  const handleArrivalToggle = (meeting: Meeting) => {
+  const handleVisualArrivalToggle = (meeting: Meeting) => {
     const now = new Date();
     const updatedMeeting = {
       ...meeting,
-      hasArrived: !meeting.hasArrived,
-      actualStartTime: !meeting.hasArrived ? now : meeting.actualStartTime,
+      visualArrived: !meeting.visualArrived,
+      visualArrivalTimestamp: !meeting.visualArrived ? now : undefined,
     };
     onUpdateMeeting(updatedMeeting);
     
     toast({
-      title: updatedMeeting.hasArrived ? "Customer Arrived" : "Customer Not Arrived",
+      title: updatedMeeting.visualArrived ? "Customer Visually Arrived" : "Customer Visual Arrival Removed",
+      description: `Status updated for ${meeting.customerName}`,
+    });
+  };
+
+  const handleArrivalToggle = (meeting: Meeting) => {
+    // Only allow arrival toggle if visually arrived
+    if (!meeting.visualArrived) return;
+
+    const now = new Date();
+    const updatedMeeting = {
+      ...meeting,
+      hasArrived: !meeting.hasArrived,
+      actualStartTime: !meeting.hasArrived ? now : undefined,
+    };
+    onUpdateMeeting(updatedMeeting);
+    
+    toast({
+      title: updatedMeeting.hasArrived ? "Customer Arrived" : "Customer Arrival Removed",
       description: `Status updated for ${meeting.customerName}`,
     });
   };
 
   const handleEndToggle = (meeting: Meeting) => {
+    // Only allow end toggle if already arrived
+    if (!meeting.hasArrived) return;
+
     const now = new Date();
     const updatedMeeting = {
       ...meeting,
       hasEnded: !meeting.hasEnded,
-      actualEndTime: !meeting.hasEnded ? now : meeting.actualEndTime,
+      actualEndTime: !meeting.hasEnded ? now : undefined,
     };
 
-    // Calculate actual duration if both start and end times are available
     if (updatedMeeting.actualStartTime && updatedMeeting.actualEndTime) {
       const durationInMinutes = Math.round(
         (updatedMeeting.actualEndTime.getTime() - updatedMeeting.actualStartTime.getTime()) / (1000 * 60)
@@ -61,7 +81,7 @@ export function MeetingsList({ meetings, onUpdateMeeting, onEditMeeting, onDelet
     onUpdateMeeting(updatedMeeting);
     
     toast({
-      title: updatedMeeting.hasEnded ? "Meeting Ended" : "Meeting Ongoing",
+      title: updatedMeeting.hasEnded ? "Meeting Ended" : "Meeting End Removed",
       description: `Status updated for ${meeting.customerName}`,
     });
   };
@@ -122,12 +142,23 @@ export function MeetingsList({ meetings, onUpdateMeeting, onEditMeeting, onDelet
               <div className="flex items-center gap-4 mb-2">
                 <div className="flex items-center gap-2">
                   <Switch
+                    checked={meeting.visualArrived ?? false}
+                    onCheckedChange={() => handleVisualArrivalToggle(meeting)}
+                    aria-label="Toggle visual arrival status"
+                  />
+                  <span className="text-sm text-muted-foreground">
+                    {meeting.visualArrived ? "Arrived" : "Not Arrived"}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Switch
                     checked={meeting.hasArrived}
                     onCheckedChange={() => handleArrivalToggle(meeting)}
                     aria-label="Toggle customer arrival"
+                    disabled={!meeting.visualArrived}
                   />
                   <span className="text-sm text-muted-foreground">
-                    {meeting.hasArrived ? "Arrived" : "Not Arrived"}
+                    {meeting.hasArrived ? "Started" : "Not Started"}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -154,6 +185,11 @@ export function MeetingsList({ meetings, onUpdateMeeting, onEditMeeting, onDelet
               <p className="text-sm text-muted-foreground">
                 Duration: {meeting.duration} mins | Wait: {meeting.waitingTime} mins
               </p>
+              {meeting.visualArrivalTimestamp && (
+                <p className="text-sm text-muted-foreground">
+                  Arrived: {format(meeting.visualArrivalTimestamp, "h:mm a")}
+                </p>
+              )}
               {meeting.actualStartTime && (
                 <p className="text-sm text-muted-foreground">
                   Started: {format(meeting.actualStartTime, "h:mm a")}

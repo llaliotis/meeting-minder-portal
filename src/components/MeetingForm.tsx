@@ -71,6 +71,7 @@ export function MeetingForm({ onSubmit, initialMeeting }: MeetingFormProps) {
       notes,
       hasArrived: initialMeeting?.hasArrived || false,
       hasEnded: initialMeeting?.hasEnded || false,
+      hasStarted: initialMeeting?.hasStarted || false,
       actualStartTime: initialMeeting?.actualStartTime,
       actualEndTime: initialMeeting?.actualEndTime,
     };

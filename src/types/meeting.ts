@@ -12,6 +12,9 @@ export interface Meeting {
   waitingTime: number; // in minutes
   notes: string;
   hasArrived: boolean;
+  hasStarted: boolean;
+  visualArrived?: boolean;
+  visualArrivalTimestamp?: Date;
   hasEnded: boolean;
   actualStartTime?: Date;
   actualEndTime?: Date;
