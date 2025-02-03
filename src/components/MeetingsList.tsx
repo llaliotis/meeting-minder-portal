@@ -37,7 +37,7 @@ export function MeetingsList({ meetings, onUpdateMeeting, onEditMeeting, onDelet
     onUpdateMeeting(updatedMeeting);
     
     toast({
-      title: updatedMeeting.visualArrived ? "Customer Visually Arrived" : "Customer Visual Arrival Removed",
+      title: updatedMeeting.visualArrived ? "Customer Arrived" : "Customer Arrival Removed",
       description: `Status updated for ${meeting.customerName}`,
     });
   };
@@ -182,9 +182,9 @@ export function MeetingsList({ meetings, onUpdateMeeting, onEditMeeting, onDelet
                 {format(meeting.startTime, "MMM d, yyyy h:mm a")} -{" "}
                 {format(meeting.endTime, "h:mm a")}
               </p>
-              <p className="text-sm text-muted-foreground">
+              {/* <p className="text-sm text-muted-foreground">
                 Duration: {meeting.duration} mins | Wait: {meeting.waitingTime} mins
-              </p>
+              </p> */}
               {meeting.visualArrivalTimestamp && (
                 <p className="text-sm text-muted-foreground">
                   Arrived: {format(meeting.visualArrivalTimestamp, "h:mm a")}
