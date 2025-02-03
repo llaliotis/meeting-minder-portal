@@ -13,8 +13,7 @@ export interface Meeting {
   notes: string;
   hasArrived: boolean;
   hasStarted: boolean;
-  visualArrived?: boolean;
-  visualArrivalTimestamp?: Date;
+  ArrivalTimestamp?: Date;
   hasEnded: boolean;
   actualStartTime?: Date;
   actualEndTime?: Date;

@@ -27,30 +27,12 @@ interface MeetingsListProps {
 export function MeetingsList({ meetings, onUpdateMeeting, onEditMeeting, onDeleteMeeting }: MeetingsListProps) {
   const { toast } = useToast();
 
-  const handleVisualArrivalToggle = (meeting: Meeting) => {
-    const now = new Date();
-    const updatedMeeting = {
-      ...meeting,
-      visualArrived: !meeting.visualArrived,
-      visualArrivalTimestamp: !meeting.visualArrived ? now : undefined,
-    };
-    onUpdateMeeting(updatedMeeting);
-    
-    toast({
-      title: updatedMeeting.visualArrived ? "Customer Arrived" : "Customer Arrival Removed",
-      description: `Status updated for ${meeting.customerName}`,
-    });
-  };
-
   const handleArrivalToggle = (meeting: Meeting) => {
-    // Only allow arrival toggle if visually arrived
-    if (!meeting.visualArrived) return;
-
     const now = new Date();
     const updatedMeeting = {
       ...meeting,
       hasArrived: !meeting.hasArrived,
-      actualStartTime: !meeting.hasArrived ? now : undefined,
+      ArrivalTimestamp: !meeting.hasArrived ? now : undefined,
     };
     onUpdateMeeting(updatedMeeting);
     
@@ -60,9 +42,25 @@ export function MeetingsList({ meetings, onUpdateMeeting, onEditMeeting, onDelet
     });
   };
 
-  const handleEndToggle = (meeting: Meeting) => {
-    // Only allow end toggle if already arrived
+  const handleStartToggle = (meeting: Meeting) => {
     if (!meeting.hasArrived) return;
+
+    const now = new Date();
+    const updatedMeeting = {
+      ...meeting,
+      hasStarted: !meeting.hasStarted,
+      actualStartTime: !meeting.hasStarted ? now : undefined,
+    };
+    onUpdateMeeting(updatedMeeting);
+    
+    toast({
+      title: updatedMeeting.hasStarted ? "Meeting Started" : "Meeting Start Removed",
+      description: `Status updated for ${meeting.customerName}`,
+    });
+  };
+
+  const handleEndToggle = (meeting: Meeting) => {
+    if (!meeting.hasStarted) return;
 
     const now = new Date();
     const updatedMeeting = {
@@ -142,31 +140,31 @@ export function MeetingsList({ meetings, onUpdateMeeting, onEditMeeting, onDelet
               <div className="flex items-center gap-4 mb-2">
                 <div className="flex items-center gap-2">
                   <Switch
-                    checked={meeting.visualArrived ?? false}
-                    onCheckedChange={() => handleVisualArrivalToggle(meeting)}
+                    checked={meeting.hasArrived ?? false}
+                    onCheckedChange={() => handleArrivalToggle(meeting)}
                     aria-label="Toggle visual arrival status"
                   />
                   <span className="text-sm text-muted-foreground">
-                    {meeting.visualArrived ? "Arrived" : "Not Arrived"}
+                    {meeting.hasArrived ? "Arrived" : "Not Arrived"}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Switch
-                    checked={meeting.hasArrived}
-                    onCheckedChange={() => handleArrivalToggle(meeting)}
-                    aria-label="Toggle customer arrival"
-                    disabled={!meeting.visualArrived}
+                    checked={meeting.hasStarted ?? false}
+                    onCheckedChange={() => handleStartToggle(meeting)}
+                    aria-label="Toggle meeting start"
+                    disabled={!meeting.hasArrived}
                   />
                   <span className="text-sm text-muted-foreground">
-                    {meeting.hasArrived ? "Started" : "Not Started"}
+                    {meeting.hasStarted ? "Started" : "Not Started"}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Switch
-                    checked={meeting.hasEnded}
+                    checked={meeting.hasEnded ?? false}
                     onCheckedChange={() => handleEndToggle(meeting)}
                     aria-label="Toggle meeting ended"
-                    disabled={!meeting.hasArrived}
+                    disabled={!meeting.hasStarted}
                   />
                   <span className="text-sm text-muted-foreground">
                     {meeting.hasEnded ? "Ended" : "Ongoing"}
@@ -182,12 +180,9 @@ export function MeetingsList({ meetings, onUpdateMeeting, onEditMeeting, onDelet
                 {format(meeting.startTime, "MMM d, yyyy h:mm a")} -{" "}
                 {format(meeting.endTime, "h:mm a")}
               </p>
-              {/* <p className="text-sm text-muted-foreground">
-                Duration: {meeting.duration} mins | Wait: {meeting.waitingTime} mins
-              </p> */}
-              {meeting.visualArrivalTimestamp && (
+              {meeting.ArrivalTimestamp && (
                 <p className="text-sm text-muted-foreground">
-                  Arrived: {format(meeting.visualArrivalTimestamp, "h:mm a")}
+                  Arrived: {format(meeting.ArrivalTimestamp, "h:mm a")}
                 </p>
               )}
               {meeting.actualStartTime && (
