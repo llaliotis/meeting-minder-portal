@@ -1,4 +1,4 @@
-export type Department = 'Sales' | 'Marketing' | 'Engineering' | 'HR' | 'Finance' | 'Other';
+export type Department = 'Passport' | 'Visa' | 'Military' | 'Other';
 
 export interface Meeting {
   id: string;
@@ -19,4 +19,4 @@ export interface Meeting {
   actualEndTime?: Date;
 }
 
-export const departments: Department[] = ['Sales', 'Marketing', 'Engineering', 'HR', 'Finance', 'Other'];
+export const departments: Department[] = ['Passport', 'Visa', 'Military', 'Other'];
