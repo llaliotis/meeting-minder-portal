@@ -5,9 +5,15 @@ import { Meeting } from "@/types/meeting";
 
 const Index = () => {
   const [meetings, setMeetings] = useState<Meeting[]>([]);
+  const [editingMeeting, setEditingMeeting] = useState<Meeting | null>(null);
 
   const handleAddMeeting = (meeting: Meeting) => {
-    setMeetings((prev) => [meeting, ...prev]);
+    if (editingMeeting) {
+      handleUpdateMeeting(meeting);
+      setEditingMeeting(null);
+    } else {
+      setMeetings((prev) => [meeting, ...prev]);
+    }
   };
 
   const handleUpdateMeeting = (updatedMeeting: Meeting) => {
@@ -18,19 +24,32 @@ const Index = () => {
     );
   };
 
+  const handleEditMeeting = (meeting: Meeting) => {
+    setEditingMeeting(meeting);
+  };
+
   return (
     <div className="container mx-auto py-8 px-4">
       <h1 className="text-3xl font-bold mb-8">Meeting Tracker</h1>
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div>
-          <h2 className="text-xl font-semibold mb-4">Record New Meeting</h2>
-          <MeetingForm onSubmit={handleAddMeeting} />
+          <h2 className="text-xl font-semibold mb-4">
+            {editingMeeting ? "Edit Meeting" : "Record New Meeting"}
+          </h2>
+          <MeetingForm 
+            onSubmit={handleAddMeeting} 
+            initialMeeting={editingMeeting}
+          />
         </div>
         
         <div>
           <h2 className="text-xl font-semibold mb-4">Today's Meetings</h2>
-          <MeetingsList meetings={meetings} onUpdateMeeting={handleUpdateMeeting} />
+          <MeetingsList 
+            meetings={meetings} 
+            onUpdateMeeting={handleUpdateMeeting}
+            onEditMeeting={handleEditMeeting}
+          />
         </div>
       </div>
     </div>

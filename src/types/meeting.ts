@@ -12,6 +12,9 @@ export interface Meeting {
   waitingTime: number; // in minutes
   notes: string;
   hasArrived: boolean;
+  hasEnded: boolean;
+  actualStartTime?: Date;
+  actualEndTime?: Date;
 }
 
 export const departments: Department[] = ['Sales', 'Marketing', 'Engineering', 'HR', 'Finance', 'Other'];

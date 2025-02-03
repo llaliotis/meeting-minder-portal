@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,8 +13,14 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { departments, type Department, type Meeting } from "@/types/meeting";
 import { useToast } from "@/components/ui/use-toast";
+import { format } from "date-fns";
 
-export function MeetingForm({ onSubmit }: { onSubmit: (meeting: Meeting) => void }) {
+interface MeetingFormProps {
+  onSubmit: (meeting: Meeting) => void;
+  initialMeeting?: Meeting | null;
+}
+
+export function MeetingForm({ onSubmit, initialMeeting }: MeetingFormProps) {
   const { toast } = useToast();
   const [customerName, setCustomerName] = useState("");
   const [photoId, setPhotoId] = useState("");
@@ -23,6 +29,18 @@ export function MeetingForm({ onSubmit }: { onSubmit: (meeting: Meeting) => void
   const [endTime, setEndTime] = useState("");
   const [waitingTime, setWaitingTime] = useState("");
   const [notes, setNotes] = useState("");
+
+  useEffect(() => {
+    if (initialMeeting) {
+      setCustomerName(initialMeeting.customerName);
+      setPhotoId(initialMeeting.photoId);
+      setDepartment(initialMeeting.department);
+      setStartTime(format(initialMeeting.startTime, "yyyy-MM-dd'T'HH:mm"));
+      setEndTime(format(initialMeeting.endTime, "yyyy-MM-dd'T'HH:mm"));
+      setWaitingTime(initialMeeting.waitingTime.toString());
+      setNotes(initialMeeting.notes);
+    }
+  }, [initialMeeting]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,8 +59,8 @@ export function MeetingForm({ onSubmit }: { onSubmit: (meeting: Meeting) => void
     const duration = Math.round((end.getTime() - start.getTime()) / (1000 * 60));
 
     const meeting: Meeting = {
-      id: Math.random().toString(36).substr(2, 9),
-      entryTime: new Date(),
+      id: initialMeeting?.id || Math.random().toString(36).substr(2, 9),
+      entryTime: initialMeeting?.entryTime || new Date(),
       customerName,
       photoId,
       department,
@@ -51,23 +69,28 @@ export function MeetingForm({ onSubmit }: { onSubmit: (meeting: Meeting) => void
       duration,
       waitingTime: parseInt(waitingTime) || 0,
       notes,
-      hasArrived: false,
+      hasArrived: initialMeeting?.hasArrived || false,
+      hasEnded: initialMeeting?.hasEnded || false,
+      actualStartTime: initialMeeting?.actualStartTime,
+      actualEndTime: initialMeeting?.actualEndTime,
     };
 
     onSubmit(meeting);
     toast({
       title: "Success",
-      description: "Meeting has been recorded",
+      description: initialMeeting ? "Meeting has been updated" : "Meeting has been recorded",
     });
 
-    // Reset form
-    setCustomerName("");
-    setPhotoId("");
-    setDepartment("Other");
-    setStartTime("");
-    setEndTime("");
-    setWaitingTime("");
-    setNotes("");
+    if (!initialMeeting) {
+      // Only reset form for new meetings
+      setCustomerName("");
+      setPhotoId("");
+      setDepartment("Other");
+      setStartTime("");
+      setEndTime("");
+      setWaitingTime("");
+      setNotes("");
+    }
   };
 
   return (
